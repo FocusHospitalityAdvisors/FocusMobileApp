@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'left',
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
   },
   leftContainer: {
     alignSelf: 'flex-start', 

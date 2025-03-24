@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   TouchableOpacity, 
+  TouchableWithoutFeedback,
   SafeAreaView, 
-  FlatList} from 'react-native';
+  FlatList,
+  Touchable} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 
@@ -16,7 +18,7 @@ const data = [
   {id: '4', title: 'Locations', content: '1', subheader: 'Active restaurants'},
 ];
 
-const Card = ({title, content, subheader}) => {
+const Card = React.memo(({title, content, subheader}) => {
   return (
     <View style={styles.card}>
       <Text style={styles.cardHeader}>{title}</Text>
@@ -24,23 +26,35 @@ const Card = ({title, content, subheader}) => {
       <Text style={styles.cardSubheader}>{subheader}</Text>
     </View>
   );
-};
+});
 
 const Dashboard = () => {
+
+  const [selectedOption, setSelectedOption] = useState('Overview');
+
+  const modeOptions = [
+    "Overview",
+    "Hourly Analysis",
+    "Categories",
+  ];
+
   const navigation = useNavigation();
-  
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
+      {/* header */}
+      <View style={styles.container}> 
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
             <Feather name="menu" size={25} color="black" />
-          </TouchableOpacity>
+          </TouchableWithoutFeedback>
           <Text style={styles.headerTitle}>Dashboard</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Ionicons name="chatbox-outline" size={25} color="black" />
           </TouchableOpacity>
         </View>
+
+        {/* cards */}
         <View>
           <FlatList
             data={data}
@@ -50,17 +64,35 @@ const Dashboard = () => {
             renderItem={({item}) => 
               <Card title={item.title} content={item.content} subheader={item.subheader} />}
           />
-          <View style={styles.modeSelection}>
-            <TouchableOpacity>
-              <Text style={styles.mode}>Overview</Text>
+        </View>
+
+        {/* mode selection */}
+        <View style={styles.modeSelection}>
+          {modeOptions.map((option, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.mode,
+                selectedOption === option && styles.selectedMode
+              ]}
+              onPress={() => setSelectedOption(option)}
+            >
+              <Text
+                style={[
+                  styles.modeFont,
+                  selectedOption === option && styles.selectedModeFont
+                ]}
+              >
+                {option}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.mode}>Hourly Analysis</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.mode}>Categories</Text>
-            </TouchableOpacity>
-          </View>
+          ))}
+        </View>
+
+        <View style={styles.container}>
+          {selectedOption === 'Overview' && <Text>Overview</Text>}
+          {selectedOption === 'Hourly Analysis' && <Text>Hourly Analysis</Text>}
+          {selectedOption === 'Categories' && <Text>Categories</Text>}
         </View>
       </View>
     </SafeAreaView>
@@ -125,9 +157,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     padding: 7,
-    marginTop: 0,
     marginLeft: 16,
-    marginRight: 20,
+    marginRight: 16,
     borderRadius: 5,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -135,15 +166,30 @@ const styles = StyleSheet.create({
   },
   
   mode: {
-    fontSize: 16,
-    color: '#000000',
-    paddingVertical: 10,
+    paddingVertical: 13,
     paddingHorizontal: 15,
     borderRadius: 5,
-    backgroundColor: '#f5f5f5',
-    borderColor: '#000000',
+    backgroundColor: '#f5f5f5', 
     textAlign: 'center',
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
+
+  modeFont: {
+    color: '#000000',
+    fontSize: 16,
+  },
+
+  selectedMode: {
+    backgroundColor: '#054922',  
+    borderColor: '#054922',  
+    justifyContent: 'center',  
+    alignItems: 'center',  
+  },
+
+  selectedModeFont: {
+    color: '#FFFFFF',
+  }
 })
 
 export default Dashboard;
